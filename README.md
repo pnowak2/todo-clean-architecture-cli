@@ -1,4 +1,4 @@
-# Todo Clean Architecture React
+# Todo Clean Architecture CLI
 
 Project aiming on implementing Uncle Bob Clean Architecture in javascript
 
