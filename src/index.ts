@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 
-const chalk = require('chalk');
-const clear = require('clear');
-const figlet = require('figlet');
-const path = require('path');
-const program = require('commander');
+import chalk from 'chalk';
+import clear from 'clear';
+import program from 'commander';
+import figlet from 'figlet';
 
 clear();
 
@@ -16,7 +15,7 @@ console.log(
 
 program
   .version('0.0.1')
-  .description("An example CLI for ordering pizza's")
+  .description('An example CLI for ordering pizza\'s')
   .option('-p, --peppers', 'Add peppers')
   .option('-P, --pineapple', 'Add pineapple')
   .option('-b, --bbq', 'Add bbq sauce')
@@ -26,9 +25,9 @@ program
 
 console.log('you ordered a pizza with:');
 
-if (program.peppers) console.log('  - peppers');
-if (program.pineapple) console.log('  - pineapple');
-if (program.bbq) console.log('  - bbq');
+if (program.peppers) { console.log('  - peppers'); }
+if (program.pineapple) { console.log('  - pineapple'); }
+if (program.bbq) { console.log('  - bbq'); }
 
 const cheese: string = true === program.cheese
   ? 'marble'
