@@ -44,9 +44,11 @@ combineLatest(todoApp.todos$, todoApp.activeTodosCount$).subscribe(([tso, count]
     )
   );
 
-  const table = new Table();
+  const table = new Table({
+    head: ['completed', 'id', 'name']
+  });
   tso.forEach(it => {
-    table.push([it.completed, it.id, it.name])
+    table.push([it.completed ? '[x]' : '[ ]', it.id, it.name])
   })
   console.log(table.toString());
 });
