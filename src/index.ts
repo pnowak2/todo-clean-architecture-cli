@@ -5,68 +5,81 @@ import chalk from 'chalk';
 import clear from 'clear';
 import program from 'commander';
 import figlet from 'figlet';
-import { merge, combineLatest } from 'rxjs';
+import inquirer from 'inquirer';
+import Table from 'cli-table';
+import { combineLatest } from 'rxjs';
 
-(async () => {
-  const todoApp: TodoPresenter = new TodoDefaultPresenter(new TodoInMemoryRepository([
-    { id: '1', title: 'foo', completed: false },
-    { id: '2', title: 'bar', completed: false },
-    { id: '3', title: 'baz', completed: true },
-  ]));
+// inquirer
+//   .prompt([
+//     {
+//       type: 'list',
+//       name: 'operation',
+//       message: 'Math Operation?',
+//       choices: ['add', 'substract', 'multiply', 'divide']
+//     }
+//   ])
+//   .then(answers => {
+//     console.info('Answer:', answers.operation);
+//   });
 
-  combineLatest(todoApp.todos$, todoApp.activeTodosCount$).subscribe(([tso, count]) => {
-    clear();
 
-    console.log(
-      chalk.red(
-        figlet.textSync('Todo CLI', { horizontalLayout: 'full' })
-      )
-    );
+const todoApp: TodoPresenter = new TodoDefaultPresenter(new TodoInMemoryRepository([
+  { id: '1', title: 'foo', completed: false },
+  { id: '2', title: 'bar', completed: false },
+  { id: '3', title: 'baz', completed: true },
+]));
 
-    console.log(
-      chalk.yellow(
-        figlet.textSync(`${count} active todos`, { horizontalLayout: 'full' })
-      )
-    );
+combineLatest(todoApp.todos$, todoApp.activeTodosCount$).subscribe(([tso, count]) => {
+  clear();
 
-    console.log(
-      chalk.blue(
-        figlet.textSync(tso.map(it => (`${it.completed ? '[x]' : '[ ]' } ${it.id}. ${it.name}`)).join(','), { horizontalLayout: 'full' })
-      )
-    );
-  });
+  console.log(
+    chalk.red(
+      figlet.textSync('Todo CLI', { horizontalLayout: 'full' })
+    )
+  );
 
-  todoApp.getActiveTodos();
-  todoApp.getCompletedTodos();
-  todoApp.getAllTodos();
-  todoApp.markTodoAsActive('3');
-  // todoApp.addTodo('a');
-  // todoApp.addTodo('b');
+  console.log(
+    chalk.yellow(
+      figlet.textSync(`${count} active todos`, { horizontalLayout: 'full' })
+    )
+  );
 
-  program
-    .version('0.0.1')
-    .description('An example CLI for ordering pizza\'s')
-    .option('-p, --peppers', 'Add peppers')
-    .option('-P, --pineapple', 'Add pineapple')
-    .option('-b, --bbq', 'Add bbq sauce')
-    .option('-c, --cheese <type>', 'Add the specified type of cheese [marble]')
-    .option('-C, --no-cheese', 'You do not want any cheese')
-    .parse(process.argv);
+  const table = new Table();
+  tso.forEach(it => {
+    table.push([it.completed, it.id, it.name])
+  })
+  console.log(table.toString());
+});
 
-  console.log('you ordered a pizza with:');
+todoApp.getActiveTodos();
+todoApp.getCompletedTodos();
+todoApp.getAllTodos();
+// todoApp.markTodoAsActive('3');
+// todoApp.addTodo('a');
+// todoApp.addTodo('b');
 
-  if (program.peppers) { console.log('  - peppers'); }
-  if (program.pineapple) { console.log('  - pineapple'); }
-  if (program.bbq) { console.log('  - bbq'); }
+program
+  .version('0.0.1')
+  .description('An example CLI for ordering pizza\'s')
+  .option('-p, --peppers', 'Add peppers')
+  .option('-P, --pineapple', 'Add pineapple')
+  .option('-b, --bbq', 'Add bbq sauce')
+  .option('-c, --cheese <type>', 'Add the specified type of cheese [marble]')
+  .option('-C, --no-cheese', 'You do not want any cheese')
+  .parse(process.argv);
 
-  const cheese: string = true === program.cheese
-    ? 'marble'
-    : program.cheese || 'no';
+console.log('you ordered a pizza with:');
 
-  console.log('  - %s cheese', cheese);
+if (program.peppers) { console.log('  - peppers'); }
+if (program.pineapple) { console.log('  - pineapple'); }
+if (program.bbq) { console.log('  - bbq'); }
 
-  if (!process.argv.slice(2).length) {
-    program.outputHelp();
-  }
+const cheese: string = true === program.cheese
+  ? 'marble'
+  : program.cheese || 'no';
 
-})();
+console.log('  - %s cheese', cheese);
+
+if (!process.argv.slice(2).length) {
+  program.outputHelp();
+}
