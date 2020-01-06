@@ -5,6 +5,7 @@ import chalk from 'chalk';
 import clear from 'clear';
 import program from 'commander';
 import figlet from 'figlet';
+import { merge, combineLatest } from 'rxjs';
 
 (async () => {
   const todoApp: TodoPresenter = new TodoDefaultPresenter(new TodoInMemoryRepository([
@@ -13,7 +14,7 @@ import figlet from 'figlet';
     { id: '3', title: 'baz', completed: true },
   ]));
 
-  todoApp.todos$.subscribe(tso => {
+  combineLatest(todoApp.todos$, todoApp.activeTodosCount$).subscribe(([tso, count]) => {
     clear();
 
     console.log(
@@ -23,8 +24,14 @@ import figlet from 'figlet';
     );
 
     console.log(
+      chalk.yellow(
+        figlet.textSync(`${count} active todos`, { horizontalLayout: 'full' })
+      )
+    );
+
+    console.log(
       chalk.blue(
-        figlet.textSync(tso.map(it => (`${it.id}. ${it.name}`)).join(','), { horizontalLayout: 'full' })
+        figlet.textSync(tso.map(it => (`${it.completed ? '[x]' : '[ ]' } ${it.id}. ${it.name}`)).join(','), { horizontalLayout: 'full' })
       )
     );
   });
@@ -32,6 +39,7 @@ import figlet from 'figlet';
   todoApp.getActiveTodos();
   todoApp.getCompletedTodos();
   todoApp.getAllTodos();
+  todoApp.markTodoAsActive('3');
   // todoApp.addTodo('a');
   // todoApp.addTodo('b');
 
