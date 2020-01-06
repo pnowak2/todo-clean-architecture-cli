@@ -8,30 +8,32 @@ import figlet from 'figlet';
 
 (async () => {
   const todoApp: TodoPresenter = new TodoDefaultPresenter(new TodoInMemoryRepository([
-    { id: '1', title: 'foo', completed: false }
+    { id: '1', title: 'foo', completed: false },
+    { id: '2', title: 'bar', completed: false },
+    { id: '3', title: 'baz', completed: true },
   ]));
 
-  // const todos = await Promise.resolve('5'); //todoApp.todos$.toPromise();
-  // const todos = await todoApp.todos$.toPromise();
-  todoApp.todos$.subscribe(todos => {
-    console.log('t', todos);
+  todoApp.todos$.subscribe(tso => {
+    clear();
+
+    console.log(
+      chalk.red(
+        figlet.textSync('Todo CLI', { horizontalLayout: 'full' })
+      )
+    );
+
+    console.log(
+      chalk.blue(
+        figlet.textSync(tso.map(it => (`${it.id}. ${it.name}`)).join(','), { horizontalLayout: 'full' })
+      )
+    );
   });
 
+  todoApp.getActiveTodos();
+  todoApp.getCompletedTodos();
   todoApp.getAllTodos();
-  // clear();
-
-
-  // console.log(
-  //   chalk.blue(
-  //     figlet.textSync(todos.toString(), { horizontalLayout: 'full' })
-  //   )
-  // );
-
-  console.log(
-    chalk.red(
-      figlet.textSync('Todo CLI', { horizontalLayout: 'full' })
-    )
-  );
+  // todoApp.addTodo('a');
+  // todoApp.addTodo('b');
 
   program
     .version('0.0.1')
