@@ -3,26 +3,11 @@
 import { TodoDefaultPresenter, TodoInMemoryRepository, TodoPresenter } from '@domisoft/todo-clean-architecture';
 import chalk from 'chalk';
 import clear from 'clear';
+import Table from 'cli-table';
 import program from 'commander';
 import figlet from 'figlet';
-import inquirer from 'inquirer';
-import Table from 'cli-table';
 import { combineLatest } from 'rxjs';
 import { skip } from 'rxjs/operators';
-
-// inquirer
-//   .prompt([
-//     {
-//       type: 'list',
-//       name: 'operation',
-//       message: 'Math Operation?',
-//       choices: ['add', 'substract', 'multiply', 'divide']
-//     }
-//   ])
-//   .then(answers => {
-//     console.info('Answer:', answers.operation);
-//   });
-
 
 const todoApp: TodoPresenter = new TodoDefaultPresenter(new TodoInMemoryRepository([
   { id: '1', title: 'foo', completed: false },
@@ -30,29 +15,33 @@ const todoApp: TodoPresenter = new TodoDefaultPresenter(new TodoInMemoryReposito
   { id: '3', title: 'baz', completed: true },
 ]));
 
-combineLatest(todoApp.todos$, todoApp.activeTodosCount$).pipe(skip(1)).subscribe(([tso, count]) => {
-  clear();
+combineLatest(todoApp.todos$, todoApp.activeTodosCount$)
+  .pipe(skip(1))
+  .subscribe(([tso, count]) => {
+    clear();
 
-  console.log(
-    chalk.red(
-      figlet.textSync('Todo CLI', { horizontalLayout: 'full' })
-    )
-  );
+    console.log(
+      chalk.red(
+        figlet.textSync('Todo CLI', { horizontalLayout: 'full' })
+      )
+    );
 
-  console.log(
-    chalk.yellow(
-      figlet.textSync(`${count} active todos`, { horizontalLayout: 'full' })
-    )
-  );
+    console.log(
+      chalk.yellow(
+        figlet.textSync(`${count} active todos`, { horizontalLayout: 'full' })
+      )
+    );
 
-  const table = new Table({
-    head: ['completed', 'id', 'name']
+    const table = new Table({
+      head: ['completed', 'id', 'name']
+    });
+
+    tso.forEach(it => {
+      table.push([it.completed ? '[x]' : '[ ]', it.id, it.name])
+    })
+
+    console.log(table.toString());
   });
-  tso.forEach(it => {
-    table.push([it.completed ? '[x]' : '[ ]', it.id, it.name])
-  })
-  console.log(table.toString());
-});
 
 todoApp.getAllTodos();
 
